@@ -1,6 +1,6 @@
 FROM python:3.10-buster AS base
 
-COPY requirements.txt requirements.txt
+COPY src/requirements.txt requirements.txt
 RUN python -m pip install -r requirements.txt
 
 ENV PYTHONUNBUFFERED=TRUE
