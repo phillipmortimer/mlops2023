@@ -1,4 +1,4 @@
-FROM python:3.10-buster AS base
+FROM 763104351884.dkr.ecr.us-east-2.amazonaws.com/huggingface-pytorch-training:4.17.0 AS base
 
 COPY src/requirements.txt requirements.txt
 RUN python -m pip install -r requirements.txt
