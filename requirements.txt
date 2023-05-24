@@ -1,5 +1,6 @@
 boto3
 jupyterlab
 jupyterlab-lsp
+pre-commit
 python-lsp-server[all]
 sagemaker
