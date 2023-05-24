@@ -8,6 +8,7 @@ from preprocess.html_to_text import html_to_text
 from preprocess.parse_args import args_to_config
 
 
+logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 

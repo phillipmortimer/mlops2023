@@ -1,3 +1,4 @@
+import logging
 import os
 
 from datasets import Dataset
@@ -7,18 +8,24 @@ from preprocess.config import PreprocessConfig
 from preprocess.html_to_text import html_to_text
 
 
+logger = logging.getLogger(__name__)
+
+
 def build_dataset(config: PreprocessConfig) -> Dataset:
     # Directory names form the path labels
     # This code was written by GPT-4
     data = []
-    for root, dirs, files in os.walk(config.input_dir):
+    for root, dirs, files in os.walk(os.path.join(config.input_dir, "TableClassifierQuaterlyWithNotes")):
         for file_name in files:
             file_path = os.path.join(root, file_name)
-            if os.path.isfile(file_path):
-                with open(file_path, "r", encoding="utf-8") as file:
-                    text = file.read()
-                    label = os.path.basename(root)  # Use subdirectory name as the label
-                    data.append({"text": text, "label": label})
+            if os.path.isfile(file_path) and file_path[-5:] == ".html":
+                with open(file_path, "r") as file:
+                    try:
+                        text = file.read()
+                        label = os.path.basename(root)  # Use subdirectory name as the label
+                        data.append({"text": text, "label": label})
+                    except Exception:
+                        logger.exception(f"Failed to read file {file_name}")
 
     return Dataset.from_list(data)
 
