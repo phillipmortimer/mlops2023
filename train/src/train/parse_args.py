@@ -2,10 +2,10 @@ import sys
 
 from argparse import ArgumentParser
 
-from train.config import TrainConfig
+from train.config import Config
 
 
-def args_to_config() -> TrainConfig:
+def args_to_config() -> Config:
     arg_parser = ArgumentParser()
 
     arg_parser.add_argument(
@@ -36,10 +36,8 @@ def args_to_config() -> TrainConfig:
 
     args = arg_parser.parse_args(sys.argv[1:])
 
-    preprocess_config = TrainConfig(
+    train_config = Config(
         sm_channel_training=args.sm_channel_training,
         sm_channel_testing=args.sm_channel_testing,
-        model_name_or_path=args.model_name_or_path,
-        model_output_directory=args.model_output_directory,
     )
-    return preprocess_config
+    return train_config
