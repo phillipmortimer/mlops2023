@@ -1,3 +1,4 @@
+from argparse import Namespace
 import logging
 
 from datasets import ClassLabel, DatasetDict
@@ -12,7 +13,6 @@ from transformers import (
     Trainer,
 )
 
-from train.config import TrainConfig
 
 CLASS_LABELS = ClassLabel(
     num_classes=5,
@@ -32,26 +32,29 @@ accuracy = evaluate.load("accuracy")
 
 
 def compute_metrics(eval_pred):
+    """
+    Evaluation function to run at the end of every epoch
+    """
     predictions, labels = eval_pred
     predictions = np.argmax(predictions, axis=1)
     return accuracy.compute(predictions=predictions, references=labels)
 
 
-def train(config: TrainConfig):
-    dataset_dict = load_data(config)
+def train(args: Namespace):
+    dataset_dict = load_data(args)
     model = AutoModelForSequenceClassification.from_pretrained(
-        "bert-base-cased", num_labels=5
+        args.pretrained_model_name_or_path, num_labels=5
     )
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-cased")
+    tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model_name_or_path)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments(
-        output_dir=config.model_output_directory,
-        learning_rate=2e-5,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
-        num_train_epochs=4,
-        weight_decay=0.01,
+        output_dir=args.model_output_directory,
+        learning_rate=args.learning_rate,
+        per_device_train_batch_size=args.per_device_training_batch_size,
+        per_device_eval_batch_size=args.per_device_eval_batch_size,
+        num_train_epochs=args.num_train_epochs,
+        weight_decay=args.weight_decay,
         evaluation_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
@@ -72,8 +75,8 @@ def train(config: TrainConfig):
 
 
 def load_data(config) -> DatasetDict:
-    train_data = Dataset.load_from_disk(config.sm_channel_training)
-    test_data = Dataset.load_from_disk(config.sm_channel_testing)
+    train_data = Dataset.load_from_disk(config.sm_channel_train)
+    test_data = Dataset.load_from_disk(config.sm_channel_test)
     # Remove the original text columns
     train_data = train_data.remove_columns("text")
     test_data = test_data.remove_columns("text")
