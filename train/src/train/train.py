@@ -1,5 +1,6 @@
 from argparse import Namespace
 import logging
+from typing import Dict
 
 from datasets import ClassLabel, DatasetDict
 from datasets.arrow_dataset import Dataset
@@ -31,7 +32,7 @@ logger = logging.getLogger(__name__)
 accuracy = evaluate.load("accuracy")
 
 
-def compute_metrics(eval_pred):
+def compute_metrics(eval_pred: Callable[[EvalPrediction], Dict]) -> Dict:
     """
     Evaluation function to run at the end of every epoch
     """
@@ -40,7 +41,7 @@ def compute_metrics(eval_pred):
     return accuracy.compute(predictions=predictions, references=labels)
 
 
-def train(args: Namespace):
+def train(args: Namespace) -> None:
     dataset_dict = load_data(args)
     model = AutoModelForSequenceClassification.from_pretrained(
         args.pretrained_model_name_or_path, num_labels=5
@@ -74,7 +75,7 @@ def train(args: Namespace):
     trainer.train()
 
 
-def load_data(config) -> DatasetDict:
+def load_data(config: Namespace) -> DatasetDict:
     train_data = Dataset.load_from_disk(config.sm_channel_train)
     test_data = Dataset.load_from_disk(config.sm_channel_test)
     # Remove the original text columns
