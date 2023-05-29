@@ -71,8 +71,9 @@
 		}
 	},
 	"mounts": [
-		"source=/home/phillippdpsl/projects/mlops2023/data/raw/,target=/opt/ml/processing/input/,type=bind,consistency=cached"
+		"source=/home/phillippdpsl/projects/mlops2023/data/raw/,target=/opt/ml/processing/input/,type=bind,consistency=cached",
+		"source=/home/phillippdpsl/projects/mlops2023/data/processed/,target=/opt/ml/processing/output/,type=bind,consistency=cached"
 	]
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	"remoteUser": "root"
+	// "remoteUser": "root"
 }

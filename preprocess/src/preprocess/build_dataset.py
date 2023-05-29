@@ -15,14 +15,16 @@ def build_dataset(config: PreprocessConfig) -> Dataset:
     # Directory names form the path labels
     # This code was written by GPT-4
     data = []
-    for root, dirs, files in os.walk(os.path.join(config.input_dir, "TableClassifierQuaterlyWithNotes")):
+    for root, dirs, files in os.walk(config.input_dir):
         for file_name in files:
             file_path = os.path.join(root, file_name)
             if os.path.isfile(file_path) and file_path[-5:] == ".html":
                 with open(file_path, "r") as file:
                     try:
                         text = file.read()
-                        label = os.path.basename(root)  # Use subdirectory name as the label
+                        label = os.path.basename(
+                            root
+                        )  # Use subdirectory name as the label
                         data.append({"text": text, "label": label})
                     except Exception:
                         logger.exception(f"Failed to read file {file_name}")
@@ -35,7 +37,7 @@ def dataset_to_text(html_data: Dataset) -> Dataset:
     Convert the html data to text
     """
     text_data = html_data.map(
-        lambda x: {"text": html_to_text(x)}, input_columns="text", num_proc=8
+        lambda x: {"text": html_to_text(x)}, input_columns="text", num_proc=2
     )
     return text_data
 

@@ -22,7 +22,7 @@ def preprocess():
         lambda x: {"text": html_to_text(x)}, input_columns="text", num_proc=4
     )
 
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+    tokenizer = AutoTokenizer.from_pretrained(config.tokenizer)
     tokenized_dataset = text_data.map(
         lambda x: tokenizer(x["text"], truncation=True), batched=True
     )
@@ -31,7 +31,9 @@ def preprocess():
         test_size=config.test_split, shuffle=True
     )
 
-    logger.info("Writing training dataset to disk")
-    dataset_dict["train"].save_to_disk(os.path.join(config.output_dir, "train"))
-    logger.info("Writing test dataset to disk")
-    dataset_dict["test"].save_to_disk(os.path.join(config.output_dir, "test"))
+    train_output = os.path.join(config.output_dir, config.tokenizer, "train")
+    logger.info(f"Writing training dataset to {train_output}")
+    dataset_dict["train"].save_to_disk(train_output)
+    test_output = os.path.join(config.output_dir, config.tokenizer, "test")
+    logger.info(f"Writing test dataset to disk {test_output}")
+    dataset_dict["test"].save_to_disk(test_output)
