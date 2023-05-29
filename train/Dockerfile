@@ -2,28 +2,21 @@
 # refer to the above page to pull latest Pytorch image
 
 # docker image region us-west-2
-FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:2.0.0-cpu-py310-ubuntu20.04-sagemaker AS hfcpu
-
-LABEL maintainer="Amazon AI"
-LABEL dlc_major_version="1"
+FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.13.1-cpu-py39-ubuntu20.04-sagemaker AS hfcpu
 
 # version args
-ARG TRANSFORMERS_VERSION=4.28.1
+ARG TRANSFORMERS_VERSION=4.26.0
 ARG DATASETS_VERSION=2.12.0
-ARG DIFFUSERS_VERSION=0.16.1
-ARG EVALUATE_VERSION=0.4.0
-ARG ACCELERATE_VERSION=0.19.0
 ARG PYTHON=python3
+
+# AWS packages
+ARG PT_TORCHAUDIO_URL=https://download.pytorch.org/whl/cu117/torchaudio-0.13.1%2Bcu117-cp39-cp39-linux_x86_64.whl
 
 # install Hugging Face libraries and its dependencies
 RUN pip install --no-cache-dir \
 	transformers[sklearn,sentencepiece,audio,vision]==${TRANSFORMERS_VERSION} \
 	datasets==${DATASETS_VERSION} \
-	diffusers==${DIFFUSERS_VERSION} \
-	Jinja2 \
-	tensorboard \
-	evaluate==${EVALUATE_VERSION} \
-	accelerate==${ACCELERATE_VERSION}
+	$PT_TORCHAUDIO_URL
 
 RUN apt-get update \
  # TODO: Remove upgrade statements once packages are updated in base image
@@ -40,6 +33,10 @@ RUN HOME_DIR=/root \
  && chmod +x ${HOME_DIR}/oss_compliance/generate_oss_compliance.sh \
  && ${HOME_DIR}/oss_compliance/generate_oss_compliance.sh ${HOME_DIR} ${PYTHON} \
  && rm -rf ${HOME_DIR}/oss_compliance*
+
+# Install additional requirements
+COPY src/requirements.txt requirements.txt
+RUN python -m pip install -r requirements.txt
 
 FROM hfcpu AS devcontainer
 
