@@ -31,9 +31,9 @@ def preprocess():
         test_size=config.test_split, shuffle=True
     )
 
-    train_output = os.path.join(config.output_dir, config.tokenizer, "train")
+    train_output = os.path.join(config.output_dir, "train")
     logger.info(f"Writing training dataset to {train_output}")
     dataset_dict["train"].save_to_disk(train_output)
-    test_output = os.path.join(config.output_dir, config.tokenizer, "test")
+    test_output = os.path.join(config.output_dir, "test")
     logger.info(f"Writing test dataset to disk {test_output}")
     dataset_dict["test"].save_to_disk(test_output)
