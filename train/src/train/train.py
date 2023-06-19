@@ -1,6 +1,6 @@
 from argparse import Namespace
 import logging
-from typing import Dict
+from typing import Callable, Dict
 
 from datasets import ClassLabel, DatasetDict
 from datasets.arrow_dataset import Dataset
@@ -10,6 +10,7 @@ from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification,
     DataCollatorWithPadding,
+    EvalPrediction,
     TrainingArguments,
     Trainer,
 )
