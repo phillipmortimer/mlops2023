@@ -74,6 +74,7 @@ def train(args: Namespace) -> None:
     )
 
     trainer.train()
+    trainer.save_model(output_dir=args.model_output_directory)
 
 
 def load_data(config: Namespace) -> DatasetDict:
