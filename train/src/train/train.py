@@ -6,6 +6,7 @@ from datasets import ClassLabel, DatasetDict
 from datasets.arrow_dataset import Dataset
 import evaluate
 import numpy as np
+from sagemaker.experiments import Run
 from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification,
@@ -14,6 +15,8 @@ from transformers import (
     TrainingArguments,
     Trainer,
 )
+
+from train.callback import SagemakerExperimentsCallback
 
 
 CLASS_LABELS = ClassLabel(
@@ -42,7 +45,7 @@ def compute_metrics(eval_pred: Callable[[EvalPrediction], Dict]) -> Dict:
     return accuracy.compute(predictions=predictions, references=labels)
 
 
-def train(args: Namespace) -> None:
+def train(args: Namespace, run: Run) -> None:
     dataset_dict = load_data(args)
     model = AutoModelForSequenceClassification.from_pretrained(
         args.pretrained_model_name_or_path, num_labels=5
@@ -72,6 +75,7 @@ def train(args: Namespace) -> None:
         data_collator=data_collator,
         compute_metrics=compute_metrics,
     )
+    trainer.add_callback(SagemakerExperimentsCallback(run=run))
 
     trainer.train()
     trainer.save_model(output_dir=args.model_output_directory)
