@@ -62,5 +62,10 @@ def args_to_config() -> Namespace:
         default=2,
     )
     arg_parser.add_argument("--weight_decay", type=float, default=0.01)
+    arg_parser.add_argument(
+        "--region",
+        type=str,
+        default="eu-west-3",
+    )
 
     return arg_parser.parse_args(sys.argv[1:])
